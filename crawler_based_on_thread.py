@@ -70,8 +70,12 @@ class Fetcher(Thread):
     def isHtml(self,text):
         header,_ = text.split(b'\r\n\r\n',1)
         header_dict = dict(h.split(": ",1) for h in header.decode().split("\r\n")[1:])
-        print(header_dict['Content-type'])
-        return header_dict['Content-type'].startswith('text/html')
+        is_html = header_dict.get('Content-type')
+        print(is_html)
+        if not is_html:
+            return False
+        else:
+            return is_html.startswith('text/html')
 
     def extractBody(self, html):
         _,body = html.split(b'\r\n\r\n',1)
