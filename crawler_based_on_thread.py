@@ -53,6 +53,7 @@ class Fetcher(Thread):
        
         links_set = set()
         for link in in_links:
+            print(link)
             part_url = re.split(r'''['"]''',link)[1] 
             whole_url = urllib.parse.urljoin(current_url,part_url)
             url_parse_result = urllib.parse.urlparse(whole_url)
