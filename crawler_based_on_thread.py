@@ -34,6 +34,7 @@ class Fetcher(Thread):
 
             lock.acquire()
             for link  in links.difference(seen_urls):
+                print(link)
                 self.tasks.put(link)
             seen_urls.update(links)
             lock.release()
@@ -49,17 +50,18 @@ class Fetcher(Thread):
             return set()
         
         body = self.extractBody(response)
-        in_links = re.findall(r'''(?i)href=['"]?[^\s"'<>]+''',body)
+        in_links = re.findall(r'''(?i)href=['"]+[^\s#"'<>]+''',body)
        
         links_set = set()
         for link in in_links:
-            print(link)
-            part_url = re.split(r'''['"]''',link)[1] 
+            _,part_url = re.split(r'''['"]''',link) 
+            if not part_url:
+                return set()
             whole_url = urllib.parse.urljoin(current_url,part_url)
             url_parse_result = urllib.parse.urlparse(whole_url)
-            # if url_parse_result.scheme not in ['http','','https']:
-            #     continue
-            # if str(url_parse_result.hostname).lower() != 'localhost':
+            if url_parse_result.scheme in ['http','https']:
+                continue
+            # if url_parse_result.hostname:
             #     continue
             links_set.add(url_parse_result.path)
         
@@ -72,7 +74,6 @@ class Fetcher(Thread):
         header,_ = text.split(b'\r\n\r\n',1)
         header_dict = dict(h.split(": ",1) for h in header.decode().split("\r\n")[1:])
         is_html = header_dict.get('Content-type')
-        print(is_html)
         if not is_html:
             return False
         else:
