@@ -5,7 +5,7 @@ import socket
 import re
 import time
 
-seen_urls = set(['/'])
+seen_urls = set('/')
 lock = Lock()
 
 class Fetcher(Thread):
@@ -17,27 +17,28 @@ class Fetcher(Thread):
         self.start()
 
     def run(self):
+        global  seen_urls
         while True:
             url = self.tasks.get()
             print(url)
             get = 'GET {} HTTP/1.1\r\nHost:localhost\r\n\r\n'.format(url)
             sckt = socket.socket()
             sckt.connect(('localhost',3000))
-            sckt.send(get.encode('ascii'))
+            sckt.send(get)
             response = b''
             chunk = sckt.recv(4096)
             while chunk:
                 response += chunk
                 chunk = sckt.recv(4096)
-              
             links = self.parseLink(url, response)
 
             lock.acquire()
+
             for link  in links.difference(seen_urls):
-                print(link)
                 self.tasks.put(link)
             seen_urls.update(links)
             lock.release()
+            
             self.tasks.task_done()
             
          
@@ -49,6 +50,7 @@ class Fetcher(Thread):
         if not self.isHtml(response):
             return set()
         
+        response = response.decode('utf-8')
         body = self.extractBody(response)
         in_links = re.findall(r'''(?i)href=['"]+[^\s#"'<>]+''',body)
        
@@ -59,29 +61,30 @@ class Fetcher(Thread):
                 return set()
             whole_url = urllib.parse.urljoin(current_url,part_url)
             url_parse_result = urllib.parse.urlparse(whole_url)
-            if url_parse_result.scheme in ['http','https']:
-                continue
-            # if url_parse_result.hostname:
+            # if url_parse_result.scheme in ['http','https']:
             #     continue
-            links_set.add(url_parse_result.path)
+            hostname = url_parse_result.hostname 
+            if  hostname :
+                continue
+            if url_parse_result.path :
+                links_set.add(url_parse_result.path)
         
-        # print(links_set)
         return links_set
             
 
 
     def isHtml(self,text):
         header,_ = text.split(b'\r\n\r\n',1)
-        header_dict = dict(h.split(": ",1) for h in header.decode().split("\r\n")[1:])
-        is_html = header_dict.get('Content-type')
+        header_dict = dict(h.split(b": ",1) for h in header.split(b"\r\n")[1:])
+        is_html = header_dict.get(b'Content-type')
         if not is_html:
             return False
         else:
-            return is_html.startswith('text/html')
+            return is_html.startswith(b'text/html')
 
     def extractBody(self, html):
-        _,body = html.split(b'\r\n\r\n',1)
-        return body.decode('utf-8')
+        _,body = html.split('\r\n\r\n',1)
+        return body
 
 class Threadpool:
     def __init__(self, num_threads):
