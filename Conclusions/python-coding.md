@@ -65,7 +65,7 @@ Unicode 是 Unique, Universal, and Uniform character encoding 的缩写。
 
 现在举例来说明，UTF-8 的编码规则可以用下表来说明：
 
-![utf-8 encoding rules](../Resources/utf-8 rules.png)
+![utf-8 encoding rules](../resources/utf-8 rules.png)
 
 
 
