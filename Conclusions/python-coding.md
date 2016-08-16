@@ -65,7 +65,7 @@ Unicode 是 Unique, Universal, and Uniform character encoding 的缩写。
 
 现在举例来说明，UTF-8 的编码规则可以用下表来说明：
 
-
+![utf-8 encoding rules](../Resources/utf-8 rules.png)
 
 
 
@@ -127,9 +127,9 @@ decode：是 encode 的逆过程，将计算机中存储的数字解码成人类
 
 python 中有 encode 和 decode 这两个函数，但它们是不同类的方法，有不少类都含有这个方法，但是值得注意的是：
 
-    1. `str` 类不含有 decode 方法，但含有 encode 方法
+    1. **str** 类不含有 decode 方法，但含有 encode 方法
 
-    2. `bytes` 类不含有 encode 方法，但含有 decode 方法
+    2. **bytes** 类不含有 encode 方法，但含有 decode 方法
 
 
 
@@ -147,22 +147,14 @@ python 中有 encode 和 decode 这两个函数，但它们是不同类的方法
 
 当然，在做爬虫的时候，不可能所有文件都是 UTF-8 的，比如图片信息，肯定不是 UTF-8，这个时候，可以通过提取 HTTP 的头部信息，利用 Context-type 域的信息来获取编码信息，比如：
 
-
-
     ```html
 
     Content-Type: text/html; charset=utf-8
 
     ```
-
-
-
 仔细想一下，你可能会发现这样一个问题，为了知道编码格式，必须提取 HTTP 头部信息，但是不知道编码格式，又怎么提取头部信息呢？
 
 其实，接收过来的数据都是字节，而 HTTP 的头部肯定都是 ASCII 格式的数据，所以可以直接按照 ASCII 来提取头部信息，具体是这样的:
-
-
-
     ```python
 
     def isHtml(self,text):
@@ -182,7 +174,6 @@ python 中有 encode 和 decode 这两个函数，但它们是不同类的方法
             return is_html.startswith(b'text/html')
 
     ```
-
 这段代码有几个细节，但是不在这里细述了，唯一要提的就是参数 `text` 是 `bytes` 类，所以在之后使用的方法 split、get、startswith 的参数都是 `bytes` 类型的。
 
 
