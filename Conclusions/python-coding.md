@@ -147,35 +147,35 @@ python 中有 encode 和 decode 这两个函数，但它们是不同类的方法
 
 当然，在做爬虫的时候，不可能所有文件都是 UTF-8 的，比如图片信息，肯定不是 UTF-8，这个时候，可以通过提取 HTTP 的头部信息，利用 Context-type 域的信息来获取编码信息，比如：
 
-    ```
+```
 
-    Content-Type: text/html; charset=utf-8
+Content-Type: text/html; charset=utf-8
 
-    ```
+```
 
 仔细想一下，你可能会发现这样一个问题，为了知道编码格式，必须提取 HTTP 头部信息，但是不知道编码格式，又怎么提取头部信息呢？
 
 其实，接收过来的数据都是字节，而 HTTP 的头部肯定都是 ASCII 格式的数据，所以可以直接按照 ASCII 来提取头部信息，具体是这样的:
 
-    ```
+```
 
-    def isHtml(self,text):
+def isHtml(self,text):
 
-        header,_ = text.split(b'\r\n\r\n',1)
+    header,_ = text.split(b'\r\n\r\n',1)
 
-        header_dict = dict(h.split(b": ",1) for h in header.split(b"\r\n")[1:])
+    header_dict = dict(h.split(b": ",1) for h in header.split(b"\r\n")[1:])
 
-        is_html = header_dict.get(b'Content-type')
+    is_html = header_dict.get(b'Content-type')
 
-        if not is_html:
+    if not is_html:
 
-            return False
+        return False
 
-        else:
+    else:
 
-            return is_html.startswith(b'text/html')
+        return is_html.startswith(b'text/html')
 
-    ```
+```
 
 这段代码有几个细节，但是不在这里细述了，唯一要提的就是参数 `text` 是 `bytes` 类，所以在之后使用的方法 split、get、startswith 的参数都是 `bytes` 类型的。
 
