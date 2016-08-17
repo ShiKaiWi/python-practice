@@ -4,7 +4,7 @@ import re
 from selectors import *
 
 seen_urls = set('/')
-urls_todo = set()
+urls_todo = set('/')
 selector = DefaultSelector()
 stopped = False
 
@@ -14,7 +14,6 @@ class Fetcher():
        self.url = url
        self.response = b''
        self.sock = None
-       self.fetch()
 
     def fetch(self):
         self.sock = socket.socket()
@@ -31,7 +30,7 @@ class Fetcher():
         selector.unregister(key.fd)
         get = 'GET {} HTTP/1.1\r\nHost:localhost\r\n\r\n'.format(self.url)
         self.sock.send(get.encode('ascii'))
-        selector.register(self.sock.fileno(),EVNET_READ,self.read_response)
+        selector.register(key.fd,EVENT_READ,self.read_response)
 
     def read_response(self,key,mask):
         global stopped
@@ -40,10 +39,10 @@ class Fetcher():
             self.response += chunk
         else:
             selector.unregister(key.fd)
-            links = self.parseLink(url, response)
+            links = self.parseLink(self.url, self.response)
             for link  in links.difference(seen_urls):
                 urls_todo.add(link)
-                Fetcher(link)
+                Fetcher(link).fetch()
             seen_urls.update(links)
             urls_todo.remove(self.url)
 
@@ -97,7 +96,7 @@ class Fetcher():
 
 
 if __name__ == "__main__":
-    Fetcher('/')
+    Fetcher('/').fetch()
     while not stopped:
         event = selector.select()
         for  event_key, event_mask in event:
