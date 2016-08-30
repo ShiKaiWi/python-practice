@@ -1,5 +1,5 @@
 import numpy as np
-import pylab
+import pylab as pylab
 import mahotas as mh
 
 img = mh.imread('./resources/dna.jpeg')
