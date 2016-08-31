@@ -6,10 +6,7 @@ def Convolution(kernel,source):
     size = kernel.size
     if size != source.size:
         return None
-    result = 0
-    for i in range(0,size):
-        result += kernel[i]*source[size-i-1]
-    return result
+    return np.sum(kernel * source)
 
 def kernel(sigma,size):
     N = size // 2
