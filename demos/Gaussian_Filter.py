@@ -1,4 +1,7 @@
-import ./Gauss_Filer as GF
+import sys
+sys.path.append('/home/kai/github-workspace/python-practice/CVlib')
 
-test = GF('../resources/Man.png')
+import GaussianFilter as GF
+
+test = GF.GaussianFilter('../resources/Man.png',sigma=2,windsize=11)
 test.demo()
