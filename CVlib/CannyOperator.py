@@ -38,7 +38,7 @@ class CannyOperator(object):
                 self.sobelmax = max(imgsobel[i][j],self.sobelmax)
         return imgsobel
 
-    def cannyOperation(self,threshold_HPercent=0.68,threshold_LPercent=0.09):
+    def cannyOperation(self,threshold_HPercent=0.30,threshold_LPercent=0.20):
         self.threshold_H = self.sobelmax*threshold_HPercent
         self.threshold_L = self.sobelmax*threshold_LPercent
         for i  in range(0,self.M):
@@ -58,6 +58,9 @@ class CannyOperator(object):
         self.track(imgx,tx,ty+1)
 
     def demo(self):
-        plt.imshow(self.cannyOperation())
+        # plt.imshow(self.imgsobel*255/self.sobelmax)
+        # plt.gray()
+        # plt.show()
+        plt.imshow(255-self.cannyOperation())
         plt.gray()
         plt.show()
